@@ -1,0 +1,231 @@
+swagger: "2.0"
+info:
+  description: >-
+    Api de consulta de información para el catálogo
+  version: 1.0.0
+  title: Documentación API catálogo
+  contact:
+    email: alberto.lopez@gposan.com
+host: localhost:3000
+basePath: /api/
+securityDefinitions:
+  APIKeyHeader:
+    type: apiKey
+    name: Authorization
+    in: header
+tags:
+  - name: Consulta
+    description: Filtro de atributos
+    externalDocs:
+      description: Find out more
+      url: http://swagger.io
+schemes:
+  - http
+paths:
+  /stores:
+    post:
+      security:
+        - APIKeyHeader: []
+      tags:
+        - Consulta
+      summary: Realiza una búsqueda de un numero de parte
+      description: Devuelve los productos que coincidan con el número de parte.
+      operationId: busquedaAtributos
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          description: Número de parte, debe de contener dos caracteres como mínimo
+          required: true
+          schema:
+            type: object
+            example:
+              numero: al
+      responses:
+        "200":
+          description: "Devuelve productos que coinciden con el numero enviado"
+          schema:
+            type: array
+            items:
+              type: object
+              $ref: "#/definitions/ProductsResponse"
+        "401":
+          description: "No estás autorizado o no mandaste el token"
+          schema:
+            $ref: "#/definitions/UnauthorizedError"
+
+        "400":
+          description: "Algo salió mal"
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/badResponse"
+  /store:
+    post:
+      security:
+        - APIKeyHeader: []
+      tags:
+        - Consulta
+      summary: Realiza una busqueda aplicando filtros
+      description: Devuelve los productos que coincidan con los filtros aplicados.
+      operationId: filtroAtributos
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          description: Espera filtro de aplicaciones o de atributos debe de contener al menos dos filtros
+          required: true
+          schema:
+            type: object
+            properties:
+              aplicaciones:
+                description: "Puede estar vacío y la búsqueda se haría por la información del producto"
+                $ref: "#/definitions/aplicacionesObject"
+              productos:
+                description: "Puede estar vacío y la búsqueda se haría por las aplicaciones"
+                $ref: "#/definitions/productosObject"
+      responses:
+        "200":
+          description: "Devuelve productos que coinciden con el numero enviado"
+          schema:
+            type: array
+            items:
+              type: object
+              $ref: "#/definitions/ProductsResponse"
+        "401":
+          description: "No estás autorizado o no mandaste el token"
+          schema:
+            $ref: "#/definitions/UnauthorizedError"
+
+        "400":
+          description: "Algo salió mal"
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/badResponse"
+
+definitions:
+  AplicacionesResponse:
+    type: object
+    properties:
+      marca:
+        type: string
+        example: "Dodge"
+      anio:
+        type: string
+        example: "1997"
+      modelo:
+        type: string
+        example: "Journey"
+      motor:
+        type: string
+        example: "5.7L - 348CID"
+      valvulas:
+        type: string
+        example: "16"
+      cantidad:
+        type: string
+        example: "1"
+      id:
+        type: string
+        example: "ID1"
+  ProductsResponse:
+    type: object
+    properties:
+      sistema:
+        type: string
+        example: "Motor"
+      segmento:
+        type: string
+        example: "Gasolina"
+      marca:
+        type: string
+        example: "Moresa"
+      linea:
+        type: string
+        example: "Anillos de pistón"
+      tipo:
+        type: string
+        example: "Anillo de Pistón"
+      numero:
+        type: string
+        example: "MD1765749"
+      imagen:
+        type: string
+        example: "Anillos_Genericos"
+      clasificacion:
+        type: string
+        enum: [Premium, Estandar]
+        example: "Estandar"
+      clave_busqueda_numero:
+        type: string
+        example: "md1765749"
+      ajuste_completo:
+        type: boolean
+        example: false
+      id:
+        type: string
+        example: "UID0436711B"
+      descripcion:
+        type: string
+        example: "Ejemplo de descripción"
+      descripcion_detalle:
+        type: string
+        example: "Ejemplo de descripción detalle"
+  aplicacionesObject:
+    type: object
+    properties:
+      anio:
+        type: string
+        example: "1997"
+      marca:
+        type: string
+        example: "Dodge"
+      modelo:
+        type: string
+        example: "Journey"
+      motor:
+        type: string
+        example: "6.7L - 409CID"
+      valvulas:
+        type: string
+        example: "16"
+  cantidadObject:
+    type: object
+    properties:
+      cantidad:
+        type: string
+        example: "1"
+  productosObject:
+    type: object
+    properties:
+      marca:
+        type: array
+        example: ["Moresa", "TF Victor"]
+      linea:
+        type: array
+        example: ["Juntas"]
+      tipo:
+        type: array
+        example: ["Junta de Carter"]
+      clasificacion:
+        type: string
+        enum: [Premium, Estandar]
+        example: "Estandar"
+  badResponse:
+    type: object
+    properties:
+      error:
+        type: object
+  UnauthorizedError:
+    type: object
+    properties:
+      error:
+        type: string
+        example: "No autorizado o no ingresaste la api key"
